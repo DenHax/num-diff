@@ -5,12 +5,18 @@
   text-align: center;
 }
 
-#calc-btn {
-  background-color: white;
-}
+#calc-btn {}
 
 #calc-inp {
   width: 100%;
+}
+
+#div-grade {
+  width: 35%;
+}
+
+#x-inp {
+  width: 60%;
 }
 
 @media (prefers-reduced-motion: no-preference) {
