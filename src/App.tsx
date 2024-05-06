@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import './App.css'
 import InputsRht from './Components/Inputs.tsx'
 let x_counter = 0;
@@ -52,6 +51,11 @@ const checkInput = (inp: string) => {
   return inp;
 }
 
+/*
+ *          f(x+h) - f(x-h)
+ * f'(x) = ----------------
+ *               2h
+*/
 const first_derive = (x: number): number => {
   const h: number = 2 * Math.sqrt(mem.E / mem.M2)
   console.log(`Оптимальный шаг ${h}`);
@@ -60,6 +64,11 @@ const first_derive = (x: number): number => {
   return f_d1;
 }
 
+/*
+ *          f(x+h) - 2f(x) + f(x-h)
+ * f''(x) = ------------------------
+ *                  h^2
+*/
 const second_derive = (x: number): number => {
   const h = 2 * Math.pow(((3 * mem.E) / mem.M4), 1 / 4);
   console.log(`Оптимальный шаг ${h}`);
@@ -69,8 +78,6 @@ const second_derive = (x: number): number => {
 }
 
 function Derive_calc() {
-  const [fileContent, setFileContent] = useState(""); // Содержимое файла
-
   const handleCalc = () => {
     mem.M2 = document.querySelector("#acc2").value;
     mem.M4 = document.querySelector("#acc4").value;
@@ -86,7 +93,7 @@ function Derive_calc() {
     }
     mem.E = E_calc();
 
-    const x: number = document.querySelector("#x-inp").value;
+    const x: number = parseFloat(document.querySelector("#x-inp").value);
     if (!x) {
       console.log("Нет x");
       return;
@@ -113,136 +120,148 @@ function Derive_calc() {
     }
     else {
       output.innerHTML = "Неправильный порядок производной";
-
     }
-    // switch (mem.deriv_grade) {
-    //   case 1:
-    //     output.innerHTML = first_derive(x).toString();
-    //     break;
-    //   case 2:
-    //     output.innerHTML = second_derive(x).toString();
-    //
-    //     break;
-    //
-    //   default:
-    //     output.innerHTML = "Неправильный порядок производной";
-    //     break;
-    // }
-
   }
 
-  interface DataPoint {
-    x: number;
-    y: number;
-  }
+  // const runge = (s, h, data: number[][]) => {
+  //   const cent_x = data[0][Math.round(data[0].length / 2)];
+  //   switch (s) {
+  //     case '1':
+  //       h *= 2;
+  //       const f_2d = (data[1][data[0][cent_x - h]] - 2 * data[1][data[0][cent_x]] + data[1][data[0][cent_x + h]]);
+  //       h /= 2;
+  //
+  //       break;
+  //
+  //     case '2':
+  //       h *= 2;
+  //       // const f_2d = (data[1][data[0][cent_x - h]] - 2 * data[1][data[0][cent_x]] + data[1][data[0][cent_x + h]]);
+  //       h /= 2;
+  //
+  //       break;
+  //
+  //     default:
+  //       break;
+  //   }
+  //         case "1":
+  //             self.h *= 2
+  //             ev_2f = (
+  //                 self.y_values[self.x_values.index(center_x - self.h)]
+  //                 - 2 * self.y_values[self.x_values.index(center_x)]
+  //                 + self.y_values[self.x_values.index(center_x + self.h)]
+  //             ) / self.h
+  //             # ic(self.ev_f, ev_2f)
+  //             print(
+  //                 f"Точность метода, вычисленная на основе метода Рунге для таблично заданной функции\n"
+  //                 f"x = {self.x_values}\ny = {self.y_values}\nравно {abs(self.ev_f - ev_2f) / 3}"
+  //             )
+  //             self.h /= 2
+  //         case "2":
+  //             self.h *= 2
+  //             ev_2f = (
+  //                 self.y_values[self.x_values.index(center_x - self.h)]
+  //                 - 2 * self.y_values[self.x_values.index(center_x)]
+  //                 + self.y_values[self.x_values.index(center_x + self.h)]
+  //             ) / self.h**2
+  //             print(
+  //                 f"Точность метода, вычисленная на основе метода Рунге для таблично заданной функции\n"
+  //                 f"x = {self.x_values}\ny = {self.y_values}\nравно {abs(self.ev_f - ev_2f) / 3}"
+  //             )
+  //             self.h /= 2
+  // except ValueError:
+  // }
 
-  interface DerivativeResult {
-    derivative: number;
-    errorEstimate: number;
-  }
-  const first_derive_tb = (data: DataPoint[], h: number, x0: number): DerivativeResult => {
-    const xValues = data.map(d => d.x);
-    const findClosestIndex = (x: number) => {
-      return xValues.reduce((prev, curr, index) => Math.abs(curr - x) < Math.abs(xValues[prev] - x) ? index : prev, 0);
-    };
-
-    const index = findClosestIndex(x0);
-
-    if (index === 0 || index === data.length - 1) {
-      throw new Error("Cannot compute derivative at boundaries");
-    }
-
-    const f_xh = data[index + 1].y;
-    const f_xmh = data[index - 1].y;
-
-    const derivative = (f_xh - f_xmh) / (2 * h);
-
-    // Оценка ошибки методом Рунге
-    const h2 = h / 2;
-    const derivative_h2 = (f_xh - f_xmh) / (2 * h2);
-    const errorEstimate = Math.abs(derivative_h2 - derivative);
-
-    return { derivative, errorEstimate };
-  };
-
-  // Функция для вычисления второй производной
-  const second_derive_tb = (data: DataPoint[], h: number, x0: number): DerivativeResult => {
-    const xValues = data.map(d => d.x);
-    const findClosestIndex = (x: number) => {
-      return xValues.reduce((prev, curr, index) => Math.abs(curr - x) < Math.abs(xValues[prev] - x) ? index : prev, 0);
-    };
-
-    const index = findClosestIndex(x0);
-
-    if (index <= 0 || index >= data.length - 1) {
-      throw new Error("Cannot compute derivative at boundaries");
-    }
-
-    const f_xh = data[index + 1].y;
-    const f_x = data[index].y;
-    const f_xmh = data[index - 1].y;
-
-    const derivative = (f_xh - 2 * f_x + f_xmh) / (h * h);
-
-    // Оценка ошибки методом Рунге
-    const h2 = h / 2;
-    const derivative_h2 = (f_xh - 2 * f_x + f_xmh) / (h2 * h2);
-    const errorEstimate = Math.abs(derivative_h2 - derivative);
-
-    return { derivative, errorEstimate };
-  };
-
-  const readTableData = (fileContent: string): DataPoint[] => {
-    const lines = fileContent.trim().split("\n");
-    return lines.map(line => {
-      const [x, y] = line.split(/\s+/).map(parseFloat);
-      return { x, y };
-    });
-  };
-
-  const handleFileCalc = () => {
-
-    const data = readTableData(fileContent);
-    console.log(data);
-    const x = data.map(d => d.x);
-    let result: DerivativeResult;
-    let h: number = (x[-1] - x[0]) / (x.length - 1);
-    for (let i = 0; i < x.length - 1; i++) {
-      if (x[i + 1] - x[i] != h) {
-        h = 0.01;
+  const first_derive_tb = (data: number[][]) => {
+    const cent_x = data[0][Math.round(data.length / 2)];
+    let h: number = (data[0][-1] - data[0][0]) / (data[0].length - 1)
+    for (let i = 0; i < data[0].length - 1; i++) {
+      if (data[0][i + 1] - data[0][i] != h) {
+        h = 0.01
       }
     }
-    console.log(h)
-    const x0: number = document.querySelector("#x-inp").value;
-
-    if (mem.deriv_grade == 1) {
-      result = first_derive_tb(data, h, x0);
-    } else if (mem.deriv_grade == 2) {
-      result = second_derive_tb(data, h, x0);
+    let f_1d;
+    if (data.length >= 3) {
+      f_1d = (data[1][cent_x + h] - data[1][data[0][cent_x - h]]) / (2 * h);
+      // runge("1", h, data);
     }
+    else {
+      f_1d = (data[1][-1] - data[1][0]) / h
+      // runge("1", h, data);
+    }
+  }
+
+  const second_derive_tb = (data: number[][]) => {
+
+  }
+
+  const handleFileCalc = () => {
+    const data = [
+      [0, 1, 2, 3, 4, 5],
+      [0, 1, 4, 9, 16, 25]
+    ]
+    mem.M2 = document.querySelector("#acc2").value;
+    mem.M4 = document.querySelector("#acc4").value;
+    if (!mem.M2 && !mem.M4) {
+      console.log("нет M2/4");
+      return;
+    }
+
+    mem.deriv_grade = document.querySelector("#div-grade").value;
+    if (!mem.deriv_grade) {
+      console.log("нет div-grade");
+      return;
+    }
+    mem.E = E_calc();
+
+    const x: number = document.querySelector("#x-inp").value;
+    if (!x) {
+      console.log("Нет x");
+      return;
+    }
+
     const output = document.querySelector("#output");
     if (!output) {
       console.log("Нет места для вывода");
       return;
     }
-    output.innerHTML = "Результаты:<br/>";
-    output.innerHTML += result.derivative;
-    output.innerHTML += "<br/>"
-    output.innerHTML += result.errorEstimate;
-    output.innerHTML += "<br/>"
+    output.innerHTML = mem.func;
+    output.innerHTML = "<p>Значение производной:</p>";
+    if (mem.deriv_grade == 1) {
+      first_derive_tb(data);
+    }
+    else if (mem.deriv_grade == 2) {
+      second_derive_tb();
+    }
+    else {
+      output.innerHTML = "Неправильный порядок производной";
+
+    }
 
 
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      setFileContent(reader.result as string);
-    };
-    reader.readAsText(file);
+    //   // let center_x = self.x_values[int(len(self.x_values) / 2)]
+    //   let center_x = data[0][Math.round(data.length / 2)];
+    //   if (data.length >= 3) {
+    //     f_d1 
+    //
+    //     self.ev_f = (
+    //       self.y_values[self.x_values.index(center_x + self.h)]
+    //       - self.y_values[self.x_values.index(center_x - self.h)]
+    //     ) / (2 * self.h)
+    //     print(
+    //       f"Значение производной таблично заданной функции\n"
+    //                           f"x = {self.x_values}\ny = {self.y_values}\n"
+    //                           f"в точке {center_x} = {self.ev_f}"
+    //     )
+    //     self.runge("1")
+    //                   else:
+    //   self.ev_f = (self.y_values[-1] - self.y_values[0]) / self.h
+    //   print(
+    //     f"Значение производной таблично заданной функции\n"
+    //                           f"x = {self.x_values}\ny = {self.y_values}\n"
+    //                           f"в точке {center_x} = {self.ev_f}"
+    //   )
+    //   self.runge("1")
+    // }
   };
 
   return (
@@ -254,7 +273,6 @@ function Derive_calc() {
       <InputsRht placeholder={"Точка, в которой будет вычисленна производная"} id='x-inp' /><br />
       <InputsRht placeholder={"Ввод функции"} id={"calc-inp"} /><br />
       <button id='calc-btn' onClick={() => handleCalc()}> Вычислить</button> <button id='calc-file-btn' onClick={() => handleFileCalc()}>Загрузить из файла</button>
-      <input type="file" accept=".txt" onChange={handleFileChange} />
       <p id='output'>Здесь будут результаты</p>
     </>
   )
