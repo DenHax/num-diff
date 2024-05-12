@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import './App.css'
 import InputsRht from './Components/Inputs.tsx'
 let x_counter = 0;
@@ -19,6 +20,7 @@ const mem: IMem = {
 };
 
 const f = (x: number) => {
+  console.log(`Function views: ${mem.func}`)
   console.log(`x${x_counter}: ${x}`);
   x_counter++;
   const result: number = eval(mem.func);
@@ -78,6 +80,10 @@ const second_derive = (x: number): number => {
 }
 
 function Derive_calc() {
+  const data = [
+    [0, 1, 2, 3, 4, 5],
+    [0, 1, 4, 9, 16, 25]
+  ];
   const handleCalc = () => {
     mem.M2 = document.querySelector("#acc2").value;
     mem.M4 = document.querySelector("#acc4").value;
@@ -195,10 +201,6 @@ function Derive_calc() {
   }
 
   const handleFileCalc = () => {
-    const data = [
-      [0, 1, 2, 3, 4, 5],
-      [0, 1, 4, 9, 16, 25]
-    ]
     mem.M2 = document.querySelector("#acc2").value;
     mem.M4 = document.querySelector("#acc4").value;
     if (!mem.M2 && !mem.M4) {
@@ -230,7 +232,7 @@ function Derive_calc() {
       first_derive_tb(data);
     }
     else if (mem.deriv_grade == 2) {
-      second_derive_tb();
+      second_derive_tb(data);
     }
     else {
       output.innerHTML = "Неправильный порядок производной";
@@ -267,12 +269,26 @@ function Derive_calc() {
   return (
     <>
       <p>Ввод данных:</p>
-      <InputsRht placeholder={"Точность 2 произв"} id='acc2' /> <br />
-      <InputsRht placeholder={"Точность 4 произв"} id='acc4' /><br />
-      <InputsRht placeholder={"Порядок производной (1, 2)"} id='div-grade' /><br />
-      <InputsRht placeholder={"Точка, в которой будет вычисленна производная"} id='x-inp' /><br />
-      <InputsRht placeholder={"Ввод функции"} id={"calc-inp"} /><br />
-      <button id='calc-btn' onClick={() => handleCalc()}> Вычислить</button> <button id='calc-file-btn' onClick={() => handleFileCalc()}>Загрузить из файла</button>
+      <p>Точность 2 производной:</p><InputsRht placeholder={"0.1"} id='acc2' /> <br />
+      <p>Точность 4 производной:</p><InputsRht placeholder={"0.2"} id='acc4' /><br />
+      <p>Порядок производной (1 или 2):</p><InputsRht placeholder={"1"} id='div-grade' /><br />
+      <p>Точка, в которой нужно вычислить производную:</p><InputsRht placeholder={"0.5"} id='x-inp' /><br />
+      <p>Функция в аналитическом виде:</p><InputsRht placeholder={"x^2*sin(e^x)"} id={"calc-inp"} /><br />
+      <p>Функция в табличном представлении:</p>
+      <table>
+        <tbody>
+          {data.map((innerArray, index) => (
+            <tr key={index}>
+              <td >{index === 0 ? "x" : "y"}
+              </td>
+              {innerArray.map((item, innerIndex) => (
+                <td key={innerIndex}>{item}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <button id='calc-btn' onClick={() => handleCalc()}>Вычислить аналитично</button> <button id='calc-file-btn' onClick={() => handleFileCalc()}>Вычислить таблично</button>
       <p id='output'>Здесь будут результаты</p>
     </>
   )
