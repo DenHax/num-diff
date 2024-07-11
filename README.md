@@ -2,7 +2,7 @@
 ```shell
 git clone https://github.com/DenHax/num-diff
 cd num-diff
-npm Install
+npm install
 
 npm run dev # режим разработки
 ```
