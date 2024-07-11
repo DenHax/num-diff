@@ -1,3 +1,13 @@
+Старт:
+```shell
+git clone https://github.com/DenHax/num-diff
+cd num-diff
+npm Install
+
+npm run dev # режим разработки
+```
+
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
